@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory & Sales - Green Land Accounting</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="p-4">
+    <div class="container">
+        <h2 class="mb-4">إدارة المخزون والمبيعات</h2>
+
+        <!-- Tabs رئيسية -->
+        <ul class="nav nav-tabs" id="mainTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="inventory-tab" data-bs-toggle="tab" data-bs-target="#inventory"
+                    type="button" role="tab"><i class="bi bi-box-seam me-2"></i>المخزون</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="sales-tab" data-bs-toggle="tab" data-bs-target="#sales" type="button"
+                    role="tab"><i class="bi bi-cash-coin me-2"></i>المبيعات</button>
+            </li>
+        </ul>
+
+        <div class="tab-content mt-3" id="mainTabsContent">
+
+            <!-- Tab المخزون -->
+            <div class="tab-pane fade show active" id="inventory" role="tabpanel">
+                <button id="addProductBtn" class="btn btn-success mb-3"><i class="bi bi-plus-circle me-1"></i> إضافة
+                    منتج</button>
+
+                <!-- Tabs فرعية للمخزون -->
+                <ul class="nav nav-tabs" id="inventoryTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="pesticides-tab" data-bs-toggle="tab"
+                            data-bs-target="#pesticides" type="button" role="tab">
+                            مبيدات</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="machines-tab" data-bs-toggle="tab" data-bs-target="#machines"
+                            type="button" role="tab"> آلات</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="seeds-tab" data-bs-toggle="tab" data-bs-target="#seeds"
+                            type="button" role="tab"> تقاوي</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="fertilizers-tab" data-bs-toggle="tab" data-bs-target="#fertilizers"
+                            type="button" role="tab"> أسمدة</button>
+                    </li>
+                </ul>
+
+                <div class="tab-content mt-3" id="inventoryTabsContent">
+
+                    <!-- جدول مبيدات -->
+                    <div class="tab-pane fade show active" id="pesticides" role="tabpanel">
+                        <div class="mb-2">
+                            <input type="text" class="form-control searchInput" placeholder="ابحث عن اسم المنتج...">
+                        </div>
+                        <table class="table table-bordered" id="pesticidesTable">
+                            <thead>
+                                <tr>
+                                    <th>اسم المنتج <button class="sort-btn btn btn-sm btn-light"
+                                            onclick="sortTable('pesticidesTable', 'name')"><i
+                                                class="bi bi-arrow-down-up"></i></button></th>
+                                    <th>الكمية <button class="sort-btn btn btn-sm btn-light"
+                                            onclick="sortTable('pesticidesTable', 'quantity')"><i
+                                                class="bi bi-arrow-down-up"></i></button></th>
+                                    <th>تاريخ الإضافة <button class="sort-btn btn btn-sm btn-light"
+                                            onclick="sortTable('pesticidesTable', 'createdAt')"><i
+                                                class="bi bi-arrow-down-up"></i></button></th>
+                                    <th>آخر تعديل <button class="sort-btn btn btn-sm btn-light"
+                                            onclick="sortTable('pesticidesTable', 'updatedAt')"><i
+                                                class="bi bi-arrow-down-up"></i></button></th>
+                                    <th>أفعال</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+
+                    <!-- جدول آلات -->
+                    <div class="tab-pane fade" id="machines" role="tabpanel">
+                        <div class="mb-2">
+                            <input type="text" class="form-control searchInput" placeholder="ابحث عن اسم المنتج...">
+                        </div>
+                        <table class="table table-bordered" id="machinesTable">
+                            <thead>
+                                <tr>
+                                    <th>اسم المنتج <button class="sort-btn btn btn-sm btn-light"
+                                            onclick="sortTable('machinesTable', 'name')"><i
+                                                class="bi bi-arrow-down-up"></i></button></th>
+                                    <th>الكمية <button class="sort-btn btn btn-sm btn-light"
+                                            onclick="sortTable('machinesTable', 'quantity')"><i
+                                                class="bi bi-arrow-down-up"></i></button></th>
+                                    <th>تاريخ الإضافة <button class="sort-btn btn btn-sm btn-light"
+                                            onclick="sortTable('machinesTable', 'createdAt')"><i
+                                                class="bi bi-arrow-down-up"></i></button></th>
+                                    <th>آخر تعديل <button class="sort-btn btn btn-sm btn-light"
+                                            onclick="sortTable('machinesTable', 'updatedAt')"><i
+                                                class="bi bi-arrow-down-up"></i></button></th>
+                                    <th>أفعال</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+
+                    <!-- جدول تقاوي -->
+                    <div class="tab-pane fade" id="seeds" role="tabpanel">
+                        <div class="mb-2">
+                            <input type="text" class="form-control searchInput" placeholder="ابحث عن اسم المنتج...">
+                        </div>
+                        <table class="table table-bordered" id="seedsTable">
+                            <thead>
+                                <tr>
+                                    <th>اسم المنتج <button class="sort-btn btn btn-sm btn-light"
+                                            onclick="sortTable('seedsTable', 'name')"><i
+                                                class="bi bi-arrow-down-up"></i></button></th>
+                                    <th>الكمية <button class="sort-btn btn btn-sm btn-light"
+                                            onclick="sortTable('seedsTable', 'quantity')"><i
+                                                class="bi bi-arrow-down-up"></i></button></th>
+                                    <th>تاريخ الإضافة <button class="sort-btn btn btn-sm btn-light"
+                                            onclick="sortTable('seedsTable', 'createdAt')"><i
+                                                class="bi bi-arrow-down-up"></i></button></th>
+                                    <th>آخر تعديل <button class="sort-btn btn btn-sm btn-light"
+                                            onclick="sortTable('seedsTable', 'updatedAt')"><i
+                                                class="bi bi-arrow-down-up"></i></button></th>
+                                    <th>أفعال</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+
+                    <!-- جدول أسمدة -->
+                    <div class="tab-pane fade" id="fertilizers" role="tabpanel">
+                        <div class="mb-2">
+                            <input type="text" class="form-control searchInput" placeholder="ابحث عن اسم المنتج...">
+                        </div>
+                        <table class="table table-bordered" id="fertilizersTable">
+                            <thead>
+                                <tr>
+                                    <th>اسم المنتج <button class="sort-btn btn btn-sm btn-light"
+                                            onclick="sortTable('fertilizersTable', 'name')"><i
+                                                class="bi bi-arrow-down-up"></i></button></th>
+                                    <th>الكمية <button class="sort-btn btn btn-sm btn-light"
+                                            onclick="sortTable('fertilizersTable', 'quantity')"><i
+                                                class="bi bi-arrow-down-up"></i></button></th>
+                                    <th>تاريخ الإضافة <button class="sort-btn btn btn-sm btn-light"
+                                            onclick="sortTable('fertilizersTable', 'createdAt')"><i
+                                                class="bi bi-arrow-down-up"></i></button></th>
+                                    <th>آخر تعديل <button class="sort-btn btn btn-sm btn-light"
+                                            onclick="sortTable('fertilizersTable', 'updatedAt')"><i
+                                                class="bi bi-arrow-down-up"></i></button></th>
+                                    <th>أفعال</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab المبيعات -->
+            <div class="tab-pane fade" id="sales" role="tabpanel">
+                <button id="addSaleBtn" class="btn btn-success mb-3"><i class="bi bi-cart-plus me-1"></i> تسجيل
+                    بيع</button>
+                <table class="table table-bordered" id="salesTable">
+                    <thead>
+                        <tr>
+                            <th>اسم المنتج</th>
+                            <th>الكمية المباعة</th>
+                            <th>التاريخ</th>
+                            <th>أفعال</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+        </div>
+
+        <button onclick="logout()" class="btn btn-danger mt-3">تسجيل خروج</button>
+    </div>
+
+    <!-- ===================== Modals ===================== -->
+
+    <!-- Modal إضافة/تعديل منتج -->
+    <div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="productModalTitle">إضافة منتج</h5>
+                </div>
+
+                <div class="modal-body">
+                    <form id="productForm">
+                        <div class="mb-3">
+                            <label class="form-label"><i class="bi bi-tag me-1"></i>اسم المنتج</label>
+                            <input type="text" class="form-control" id="productName" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label"><i class="bi bi-hash me-1"></i>الكمية</label>
+                            <input type="number" class="form-control" id="productQuantity" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label"><i class="bi bi-list-ul me-1"></i>القسم</label>
+                            <select class="form-select" id="productCategory" required>
+                                <option value="" disabled selected>اختر القسم</option>
+                                <option value="مبيدات">مبيدات</option>
+                                <option value="آلات">آلات</option>
+                                <option value="تقاوي">تقاوي</option>
+                                <option value="أسمدة">أسمدة</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i
+                            class="bi bi-x-lg me-1"></i> إلغاء</button>
+                    <button type="button" class="btn btn-primary" id="saveProductBtn"><i
+                            class="bi bi-check-lg me-1"></i> حفظ</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal تسجيل/تعديل بيع -->
+    <div class="modal fade" id="saleModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="saleModalTitle">تسجيل بيع</h5>
+                </div>
+
+                <div class="modal-body">
+                    <form id="saleForm">
+
+                        <div class="mb-3">
+                            <label class="form-label"><i class="bi bi-box me-1"></i>اختر المنتج</label>
+                            <select class="form-select" id="saleProduct" required></select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label"><i class="bi bi-hash me-1"></i>الكمية المباعة</label>
+                            <input type="number" class="form-control" id="saleQuantity" required>
+                        </div>
+
+                        <div id="saleError"></div>
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i
+                            class="bi bi-x-lg me-1"></i> إلغاء</button>
+                    <button type="button" class="btn btn-primary" id="saveSaleBtn"><i class="bi bi-check-lg me-1"></i>
+                        حفظ</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal تأكيد الحذف الجمالي -->
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-body text-center p-4">
+                    <div class="mb-3">
+                        <div class="delete-icon-wrapper mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="#e74c3c"
+                                class="bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
+                                <path
+                                    d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+                            </svg>
+                        </div>
+                        <h4 class="fw-bold mb-2">تأكيد الحذف النهائي</h4>
+                        <p class="text-muted" id="deleteModalMessage">هل أنت متأكد من رغبتك في حذف هذا العنصر؟ لا يمكن
+                            التراجع عن هذه العملية.</p>
+                    </div>
+                    <div class="d-flex justify-content-center gap-2">
+                        <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">إلغاء</button>
+                        <button type="button" class="btn btn-danger px-4" id="confirmDeleteBtn">حذف الآن</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== End Modals ===================== -->
+
+    <!-- Firebase compat scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <!-- ملفات المشروع -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/inventory.js"></script>
+    <script src="js/sales.js"></script>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        © 2026 جميع الحقوق محفوظة | الموقع من تصميم <span>م. زياد عبدالكريم || Eng. Ziad Abdulkarim</span>
+    </footer>
+</body>
+
+</html>
