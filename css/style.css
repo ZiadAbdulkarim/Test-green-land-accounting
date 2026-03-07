@@ -120,7 +120,7 @@ h2 {
 }
 
 #mainTabs .nav-link:hover {
-    color: #2e86de;
+    color: #27ae60;
     background-color: #f8faff;
     transform: translateY(-2px);
 }
@@ -819,4 +819,5 @@ h2 {
         font-size: 0.65rem;
         white-space: nowrap;
     }
+
 }
