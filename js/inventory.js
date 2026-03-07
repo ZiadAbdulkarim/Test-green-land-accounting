@@ -92,47 +92,37 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
 // ------------------ 3 – حفظ (إضافة أو تعديل) ------------------
-saveProductBtn.addEventListener("click", () => {
-  const name = productNameInput.value.trim();
-  const quantity = parseInt(productQuantityInput.value, 10);
-  const category = productCategoryInput.value;
+  saveProductBtn.addEventListener("click", () => {
+    const name = productNameInput.value.trim();
+    const quantity = parseInt(productQuantityInput.value, 10);
+    const category = productCategoryInput.value;
 
-  // تحقق من كل الحقول
-  if (!name  isNaN(quantity)  !category) {
-    let errorMsg = "يرجى تعبئة كل الحقول المطلوبة:\n";
-    if (!name) errorMsg += "- الاسم مطلوب\n";
-    if (isNaN(quantity)) errorMsg += "- الكمية لازم تكون رقم\n";
-    if (!category) errorMsg += "- اختر القسم\n";
-    return showAppToast(errorMsg, "error");
-  }
+    if (!name) return alert("الاسم مطلوب!");
+    if (isNaN(quantity)) return alert("الكمية لازم تكون رقم!");
 
-  if (editingProductId) {
-    // تعديل منتج موجود
-    db.collection("inventory").doc(editingProductId).update({
-      name,
-      quantity,
-      category,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => {
-      showAppToast("تم تعديل المنتج بنجاح", "success");
-      productModal.hide();
-      loadInventory();
-    });
-  } else {
-    // إضافة منتج جديد
-    db.collection("inventory").add({
-      name,
-      quantity,
-      category,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => {
-      showAppToast("تم إضافة المنتج بنجاح", "success");
-      productModal.hide();
-      loadInventory();
-    });
-  }
-});
+    if (editingProductId) {
+      db.collection("inventory").doc(editingProductId).update({
+        name,
+        quantity,
+        category,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        productModal.hide();
+        loadInventory();
+      });
+    } else {
+      db.collection("inventory").add({
+        name,
+        quantity,
+        category,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        productModal.hide();
+        loadInventory();
+      });
+    }
+  });
 
   // ------------------ 4 – تعديل منتج ------------------
   window.editProduct = (id, currentName, currentQuantity, currentCategory) => {
@@ -229,3 +219,4 @@ saveProductBtn.addEventListener("click", () => {
 
 
 });
+
