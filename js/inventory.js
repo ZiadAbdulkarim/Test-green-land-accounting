@@ -92,37 +92,40 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
 // ------------------ 3 – حفظ (إضافة أو تعديل) ------------------
-  saveProductBtn.addEventListener("click", () => {
-    const name = productNameInput.value.trim();
-    const quantity = parseInt(productQuantityInput.value, 10);
-    const category = productCategoryInput.value;
+saveProductBtn.addEventListener("click", () => {
+  const name = productNameInput.value.trim();
+  const quantity = parseInt(productQuantityInput.value, 10);
+  const category = productCategoryInput.value;
 
-    if (!name) return alert("الاسم مطلوب!");
-    if (isNaN(quantity)) return alert("الكمية لازم تكون رقم!");
+  // التحقق من كل الحقول
+  if (!name || !category || isNaN(quantity)) {
+    alert("كل حقول الفورم مطلوبة!");
+    return;
+  }
 
-    if (editingProductId) {
-      db.collection("inventory").doc(editingProductId).update({
-        name,
-        quantity,
-        category,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => {
-        productModal.hide();
-        loadInventory();
-      });
-    } else {
-      db.collection("inventory").add({
-        name,
-        quantity,
-        category,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => {
-        productModal.hide();
-        loadInventory();
-      });
-    }
-  });
+  if (editingProductId) {
+    db.collection("inventory").doc(editingProductId).update({
+      name,
+      quantity,
+      category,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+      productModal.hide();
+      loadInventory();
+    });
+  } else {
+    db.collection("inventory").add({
+      name,
+      quantity,
+      category,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+      productModal.hide();
+      loadInventory();
+    });
+  }
+});
 
   // ------------------ 4 – تعديل منتج ------------------
   window.editProduct = (id, currentName, currentQuantity, currentCategory) => {
