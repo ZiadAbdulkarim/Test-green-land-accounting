@@ -53,7 +53,15 @@ if (togglePassword && passwordInput && eyeIcon) {
 
 // حماية الصفحات
 auth.onAuthStateChanged((user) => {
-  if (!user && !window.location.href.includes("index.html")) {
+  const isLoginPage = window.location.href.includes("index.html");
+
+  if (user && isLoginPage) {
+    // لو مسجل دخول وفتح صفحة اللوجين
+    window.location.href = "inventory_sales.html";
+  }
+
+  if (!user && !isLoginPage) {
+    // لو مش مسجل دخول وفتح صفحة داخل النظام
     window.location.href = "index.html";
   }
 });
@@ -65,3 +73,4 @@ function logout() {
   });
 
 }
+
