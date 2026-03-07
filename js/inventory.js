@@ -91,41 +91,51 @@ document.addEventListener("DOMContentLoaded", function () {
     productModal.show();
   });
 
-// ------------------ 3 – حفظ (إضافة أو تعديل) ------------------
-saveProductBtn.addEventListener("click", () => {
-  const name = productNameInput.value.trim();
-  const quantity = parseInt(productQuantityInput.value, 10);
-  const category = productCategoryInput.value;
+  // ------------------ 3 – حفظ (إضافة أو تعديل) ------------------
+  saveProductBtn.addEventListener("click", () => {
+    const name = productNameInput.value.trim();
+    const quantity = parseInt(productQuantityInput.value, 10);
+    const category = productCategoryInput.value;
 
-  // التحقق من كل الحقول
-  if (!name || !category || isNaN(quantity)) {
-    alert("كل حقول الفورم مطلوبة!");
-    return;
-  }
+    // التحقق من كل الحقول
+    if (!name || !category || isNaN(quantity)) {
+      return showProductError("كل حقول الفورم مطلوبة");
+    }
 
-  if (editingProductId) {
-    db.collection("inventory").doc(editingProductId).update({
-      name,
-      quantity,
-      category,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => {
-      productModal.hide();
-      loadInventory();
-    });
-  } else {
-    db.collection("inventory").add({
-      name,
-      quantity,
-      category,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => {
-      productModal.hide();
-      loadInventory();
-    });
+    if (editingProductId) {
+      db.collection("inventory").doc(editingProductId).update({
+        name,
+        quantity,
+        category,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        productModal.hide();
+        loadInventory();
+      });
+    } else {
+      db.collection("inventory").add({
+        name,
+        quantity,
+        category,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        productModal.hide();
+        loadInventory();
+      });
+    }
+  });
+
+  const productError = document.getElementById("productError");
+
+  function showProductError(message) {
+    productError.innerHTML = `
+        <div class="sale-error-container">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span>${message}</span>
+        </div>
+    `;
   }
-});
 
   // ------------------ 4 – تعديل منتج ------------------
   window.editProduct = (id, currentName, currentQuantity, currentCategory) => {
@@ -222,4 +232,3 @@ saveProductBtn.addEventListener("click", () => {
 
 
 });
-
