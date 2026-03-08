@@ -171,7 +171,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             } catch (err) {
                 console.error(err);
-                alert("حدث خطأ أثناء حفظ البيع");
+                showSaleError("حدث خطأ أثناء حفظ البيع");
             }
         });
     }
