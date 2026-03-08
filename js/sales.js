@@ -159,79 +159,70 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // ------------------ 4 – حذف بيع وإرجاع المخزون ------------------
     window.deleteSaleWithRestore = async (saleId, productId, quantitySold) => {
-    window.requestDelete("تأكيد الإرجاع إلى المخزون سيتم إرجاع الكمية للمخزون وحذف العملية، هل أنت متأكد؟", async () => {
-        try {
-            const productDoc = await db.collection("inventory").doc(productId).get();
-            if (productDoc.exists) {
-                const productData = productDoc.data();
-                await db.collection("inventory").doc(productId).update({
-                    quantity: productData.quantity + quantitySold,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-            } else {
-                // المنتج مش موجود بالمخزون، نحذفه نهائياً بدون رسائل
-                await db.collection("sales").doc(saleId).delete();
-                loadSales();
-                return;
-            }
-
-            await db.collection("sales").doc(saleId).delete();
-
-            loadInventory();
-            loadSales();
-
-        } catch (err) {
-            console.error(err);
-
-            const errorBox = document.createElement("div");
-            errorBox.className = "sale-error-container";
-            errorBox.innerHTML = `
-                <i class="bi bi-exclamation-triangle-fill"></i>
-                <span>حدث خطأ أثناء إرجاع المنتج للمخزون</span>
-            `;
-            document.body.appendChild(errorBox);
-
-            setTimeout(() => {
-                errorBox.remove();
-            }, 4000);
-        }
-    });
-};
-
-    // ------------------ 5 – حذف الشهر بالكامل وإرجاع المخزون ------------------
-    window.deleteMonth = async (monthKey) => {
-        window.requestDelete("هل تريد حذف كل مبيعات هذا الشهر نهائيًا؟ سيتم إرجاع كافة الكميات للمخزون.", async () => {
+        window.requestDelete("سيتم إرجاع الكمية للمخزون وحذف العملية، هل أنت متأكد؟", async () => {
             try {
-                const snapshot = await db.collection("sales").get();
-                const batch = db.batch();
-
-                for (const doc of snapshot.docs) {
-                    const sale = doc.data();
-                    const dateObj = sale.date.toDate();
-                    const key = `${dateObj.getFullYear()}-${dateObj.getMonth() + 1}`;
-                    if (key === monthKey) {
-                        const productDoc = await db.collection("inventory").doc(sale.productId).get();
-                        if (productDoc.exists) {
-                            const productData = productDoc.data();
-                            batch.update(productDoc.ref, {
-                                quantity: productData.quantity + sale.quantitySold,
-                                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                            });
-                        }
-                        batch.delete(doc.ref);
-                    }
+                const productDoc = await db.collection("inventory").doc(productId).get();
+                if (productDoc.exists) {
+                    const productData = productDoc.data();
+                    await db.collection("inventory").doc(productId).update({
+                        quantity: productData.quantity + quantitySold,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                } else {
+                    // المنتج مش موجود بالمخزون، نحذفه نهائياً بدون رسائل
+                    await db.collection("sales").doc(saleId).delete();
+                    loadSales();
+                    return;
                 }
 
-                await batch.commit();
+                await db.collection("sales").doc(saleId).delete();
+
                 loadInventory();
                 loadSales();
 
             } catch (err) {
                 console.error(err);
-                alert("حدث خطأ أثناء حذف الشهر");
+
+                const errorBox = document.createElement("div");
+                errorBox.className = "sale-error-container";
+                errorBox.innerHTML = `
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <span>حدث خطأ أثناء إرجاع المنتج للمخزون</span>
+            `;
+                document.body.appendChild(errorBox);
+
+                setTimeout(() => {
+                    errorBox.remove();
+                }, 4000);
             }
         });
     };
+
+   // ------------------ 5 – حذف الشهر بالكامل ------------------
+window.deleteMonth = async (monthKey) => {
+    window.requestDelete("هل تريد حذف كل مبيعات هذا الشهر نهائيًا؟", async () => {
+        try {
+            const snapshot = await db.collection("sales").get();
+            const batch = db.batch();
+
+            for (const doc of snapshot.docs) {
+                const sale = doc.data();
+                const dateObj = sale.date.toDate();
+                const key = `${dateObj.getFullYear()}-${dateObj.getMonth() + 1}`;
+                if (key === monthKey) {
+                    batch.delete(doc.ref); // حذف المبيعات الخاصة بالشهر فقط
+                }
+            }
+
+            await batch.commit();
+            loadSales(monthKey); // عرض المبيعات بعد الحذف بدون التأثير على المخزون
+
+        } catch (err) {
+            console.error(err);
+            alert("حدث خطأ أثناء حذف الشهر");
+        }
+    });
+};
 
     // ------------------ 6 – تحميل المبيعات عند فتح الصفحة ------------------
     loadSales();
