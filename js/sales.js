@@ -59,14 +59,9 @@ document.addEventListener("DOMContentLoaded", function () {
                       <td data-label="الكمية المباعة">${sale.quantitySold}</td>
                       <td data-label="التاريخ">${sale.date.toDate().toLocaleString('ar-EG')}</td>
                       <td>
-                          <button class="btn btn-sm btn-warning me-1" 
-                              onclick="openEditSaleModal('${sale.id}', '${sale.productId}', ${sale.quantitySold})">
-                              <i class="bi bi-pencil-square me-1"></i> تعديل
-                          </button>
-                          <button class="btn btn-sm btn-info" 
-                              onclick="deleteSaleWithRestore('${sale.id}', '${sale.productId}', ${sale.quantitySold})">
-                              <i class="bi bi-arrow-counterclockwise me-1"></i> إرجاع إلى المخزون
-                          </button>
+                        <button class="btn btn-sm btn-info" onclick="deleteSaleWithRestore('${sale.id}', '${sale.productId}', ${sale.quantitySold})">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i> إرجاع إلى المخزون
+                        </button>
                       </td>
                   `;
                     salesTableBody.appendChild(tr);
@@ -99,6 +94,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 saleQuantityInput.value = "";
                 saleError.innerHTML = ""; // مسح الأخطاء السابقة
                 editingSaleId = null;
+                saleProductSelect.disabled = false;
                 document.getElementById("saleModalTitle").innerText = "تسجيل بيع";
                 saveSaleBtn.innerText = "حفظ";
                 saleModal.show();
@@ -178,11 +174,27 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // ------------------ 4 – فتح Modal لتعديل البيع ------------------
     window.openEditSaleModal = async (saleId, productId, quantitySold) => {
+
         editingSaleId = saleId;
-        saleProductSelect.value = productId;
+
+        // تحميل المنتج الخاص بالعملية فقط
+        const productDoc = await db.collection("inventory").doc(productId).get();
+        const productData = productDoc.data();
+
+        saleProductSelect.innerHTML = "";
+        const option = document.createElement("option");
+        option.value = productId;
+        option.textContent = `${productData.name}`;
+        saleProductSelect.appendChild(option);
+
+        // منع تعديل المنتج
+        saleProductSelect.disabled = true;
+
         saleQuantityInput.value = quantitySold;
+
         document.getElementById("saleModalTitle").innerText = "تعديل البيع";
         saveSaleBtn.innerText = "تعديل";
+
         saleModal.show();
     };
 
