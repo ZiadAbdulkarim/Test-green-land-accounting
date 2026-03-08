@@ -11,8 +11,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const saleQuantityInput = document.getElementById("saleQuantity");
     const saveSaleBtn = document.getElementById("saveSaleBtn");
 
-    let editingSaleId = null;
-
     // ------------------ 1 – تحميل كل المبيعات وعرضها ------------------
     function loadSales() {
         if (!salesTableBody) return;
@@ -133,20 +131,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     return showSaleError("الكمية المطلوبة أكبر من المتوفر في المخزون!");
                 }
 
-                if (editingSaleId) {
-                    // تعديل بيع
-                    const saleDoc = await db.collection("sales").doc(editingSaleId).get();
-                    const oldQuantity = saleDoc.data().quantitySold;
-                    const diff = quantitySold - oldQuantity;
-
-                    if (productData.quantity - diff < 0) return showSaleError("الكمية المطلوبة تتجاوز المخزون!");
-
-                    await db.collection("sales").doc(editingSaleId).update({ quantitySold });
-                    await db.collection("inventory").doc(productId).update({
-                        quantity: productData.quantity - diff,
-                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                } else {
+                {
                     // إضافة بيع جديد
                     await db.collection("sales").add({
                         productId,
@@ -172,58 +157,48 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // ------------------ 4 – فتح Modal لتعديل البيع ------------------
-    window.openEditSaleModal = async (saleId, productId, quantitySold) => {
-
-        editingSaleId = saleId;
-
-        // تحميل المنتج الخاص بالعملية فقط
-        const productDoc = await db.collection("inventory").doc(productId).get();
-        const productData = productDoc.data();
-
-        saleProductSelect.innerHTML = "";
-        const option = document.createElement("option");
-        option.value = productId;
-        option.textContent = `${productData.name}`;
-        saleProductSelect.appendChild(option);
-
-        // منع تعديل المنتج
-        saleProductSelect.disabled = true;
-
-        saleQuantityInput.value = quantitySold;
-
-        document.getElementById("saleModalTitle").innerText = "تعديل البيع";
-        saveSaleBtn.innerText = "تعديل";
-
-        saleModal.show();
-    };
-
-    // ------------------ 5 – حذف بيع وإرجاع المخزون ------------------
+    // ------------------ 4 – حذف بيع وإرجاع المخزون ------------------
     window.deleteSaleWithRestore = async (saleId, productId, quantitySold) => {
-        window.requestDelete("سيتم إرجاع الكمية للمخزون وحذف العملية، هل أنت متأكد؟", async () => {
-            try {
-                const productDoc = await db.collection("inventory").doc(productId).get();
-                if (productDoc.exists) {
-                    const productData = productDoc.data();
-                    await db.collection("inventory").doc(productId).update({
-                        quantity: productData.quantity + quantitySold,
-                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                }
-
+    window.requestDelete("تأكيد الإرجاع إلى المخزون سيتم إرجاع الكمية للمخزون وحذف العملية، هل أنت متأكد؟", async () => {
+        try {
+            const productDoc = await db.collection("inventory").doc(productId).get();
+            if (productDoc.exists) {
+                const productData = productDoc.data();
+                await db.collection("inventory").doc(productId).update({
+                    quantity: productData.quantity + quantitySold,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } else {
+                // المنتج مش موجود بالمخزون، نحذفه نهائياً بدون رسائل
                 await db.collection("sales").doc(saleId).delete();
-
-                loadInventory();
                 loadSales();
-
-            } catch (err) {
-                console.error(err);
-                alert("حدث خطأ أثناء الحذف");
+                return;
             }
-        });
-    };
 
-    // ------------------ 6 – حذف الشهر بالكامل وإرجاع المخزون ------------------
+            await db.collection("sales").doc(saleId).delete();
+
+            loadInventory();
+            loadSales();
+
+        } catch (err) {
+            console.error(err);
+
+            const errorBox = document.createElement("div");
+            errorBox.className = "sale-error-container";
+            errorBox.innerHTML = `
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <span>حدث خطأ أثناء إرجاع المنتج للمخزون</span>
+            `;
+            document.body.appendChild(errorBox);
+
+            setTimeout(() => {
+                errorBox.remove();
+            }, 4000);
+        }
+    });
+};
+
+    // ------------------ 5 – حذف الشهر بالكامل وإرجاع المخزون ------------------
     window.deleteMonth = async (monthKey) => {
         window.requestDelete("هل تريد حذف كل مبيعات هذا الشهر نهائيًا؟ سيتم إرجاع كافة الكميات للمخزون.", async () => {
             try {
@@ -258,7 +233,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     };
 
-    // ------------------ 7 – تحميل المبيعات عند فتح الصفحة ------------------
+    // ------------------ 6 – تحميل المبيعات عند فتح الصفحة ------------------
     loadSales();
 
 });
